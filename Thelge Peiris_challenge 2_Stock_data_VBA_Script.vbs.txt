@@ -1,0 +1,185 @@
+Sub Ticker()
+
+    Dim ws As Worksheet
+    
+    For Each ws In Worksheets
+
+        'Defining variables
+        Dim i As Double
+        Dim Lastrow As Double
+        Dim lastrow2 As Double
+        Dim OpenValue As Double
+        Dim Ticker_Name As String
+        Dim Ticker_Volume As Double
+        Dim GrtIncrease As Double
+        Dim GrtIncTicker As String
+        Dim GrtDecrease As Double
+        Dim GrtDecTicker As String
+        Dim GrtVol As Double
+        Dim GrtVolTicker As String
+    
+        'Adding column headers
+        ws.Cells(1, 10).Value = "Ticker"
+        ws.Cells(1, 11).Value = "Yearly Change"
+        ws.Cells(1, 12).Value = "Percent Change"
+        ws.Cells(1, 13).Value = "Total Stock Volume"
+        
+        'Adding column headers and row lables fo the bonus part
+        ws.Cells(1, 17).Value = "Ticker"
+        ws.Cells(1, 18).Value = "Value"
+        ws.Cells(2, 16).Value = "Greatest % increase"
+        ws.Cells(3, 16).Value = "Greatest % decrease"
+        ws.Cells(4, 16).Value = "Greatest Total Volume"
+            
+        'Get the count of rows which has a ticker name
+        Lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        'Initial value of the Total stock volume
+        Ticker_Volume = 0
+        'Counting the number of ticker names
+        Ticker_count = 1
+        'Open stock value of the first ticker
+        OpenVal = ws.Cells(2, 3).Value
+   
+                  
+        'Loop through the each and every cell in column 1 which has a value
+        For i = 2 To Lastrow
+    
+            'If found a different ticker name in the next cell
+            If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+        
+                'the number of ticker names will increase by 1
+                Ticker_count = Ticker_count + 1
+            
+                'assign the ticker name to Ticker_Name variable
+                Ticker_Name = ws.Cells(i, 1).Value
+            
+                'add the stock volume of the last day of the year for a given ticker
+                Ticker_Volume = Ticker_Volume + ws.Cells(i, 7).Value
+        
+                'assign each new ticker names in a new row in column 10 in the table
+                ws.Cells(Ticker_count, 10).Value = Ticker_Name
+            
+                'assign the total stock volume for particular ticker in column 13 in the table
+                ws.Cells(Ticker_count, 13).Value = Ticker_Volume
+        
+                'calculate and assign the yearly change in column 11 in table
+                ws.Cells(Ticker_count, 11).Value = ws.Cells(i, 6).Value - OpenVal
+        
+                'calculate and assign percent change in column 12 in the table
+                ws.Cells(Ticker_count, 12).Value = ws.Cells(Ticker_count, 11).Value / OpenVal
+      
+                'When found a new ticker, assign the open value of that new ticker to the variable OpenVal
+                OpenVal = ws.Cells(i + 1, 3).Value
+       
+                'When found a new ticker, Ticker_Volume variable reset to zero
+                Ticker_Volume = 0
+      
+            Else
+        
+                'If found the same ticker name in the next cell, add the stock volume of that line to the variable Ticker_Volume
+                Ticker_Volume = Ticker_Volume + ws.Cells(i, 7).Value
+       
+            End If
+    
+        Next i
+    
+        'Change the format of the Percentage change column to show % with two decimal places
+       
+        ws.Range("L2:L" & Ticker_count).NumberFormat = "0.00%"
+        
+        'Add color red or green for negative and positive values respectively in Yearly Change column and Percent change column
+        
+        For i = 2 To Ticker_count
+        
+            If ws.Cells(i, 11).Value > 0 Then
+                ws.Cells(i, 11).Interior.ColorIndex = 4
+                ws.Cells(i, 12).Interior.ColorIndex = 4
+                
+                ElseIf ws.Cells(i, 11).Value < 0 Then
+                    ws.Cells(i, 11).Interior.ColorIndex = 3
+                    ws.Cells(i, 12).Interior.ColorIndex = 3
+            
+            Else
+                ws.Cells(i, 11).Interior.ColorIndex = 4
+                ws.Cells(i, 12).Interior.ColorIndex = 4
+            
+            End If
+        
+        Next i
+       
+        'Assigning values to the variable for Bonus part
+        
+        'Get the count of rows which has a value in percentage change column
+        lastrow2 = ws.Cells(Rows.Count, 12).End(xlUp).Row
+        'Assign the percent change of the first ticker in the table to the variable GrtIncrease
+        GrtIncrease = ws.Cells(2, 12).Value
+        'Assign the percent change of the first ticker in the table to the variable GrtDecrease
+        GrtDecrease = ws.Cells(2, 12).Value
+        'Assign the first ticker name to the variable GrtIncTicker
+        GrtIncTicker = ws.Cells(2, 10).Value
+        'Assign the first ticker name to the variable GrtDecTicker
+        GrtDecTicker = ws.Cells(2, 10).Value
+        'Assign the total stock volume of the first ticker in the table to the variable GrtVol
+        GrtVol = ws.Cells(2, 13).Value
+        'Assign the first ticker name to the variable GrtVolTicker
+        GrtVolTicker = ws.Cells(2, 10).Value
+        
+        'Loop through the each and every cell of the Percent Change column of the table created above (column 12)
+        For i = 3 To lastrow2
+    
+            'If found a greater perecntage change than the GrtIncrease
+            If ws.Cells(i, 12).Value > GrtIncrease Then
+            
+                'Replace GrtIncrease variable with the greater value
+                GrtIncrease = ws.Cells(i, 12).Value
+                'Replace GrtIncTicker variable with the ticker name which has the greater value
+                GrtIncTicker = ws.Cells(i, 10).Value
+            
+            Else
+            
+            End If
+            
+            'If found a lower perecntage change than the GrtDecrease
+            If ws.Cells(i, 12).Value < GrtDecrease Then
+            
+                'Replace GrtDecrease variable with the lower value
+                GrtDecrease = ws.Cells(i, 12).Value
+                'Replace GrtDecTicker variable with the ticker name which has the lower value
+                GrtDecTicker = ws.Cells(i, 10).Value
+            
+            Else
+            
+            End If
+    
+            'If found a greater value than the GrtVol
+            If ws.Cells(i, 13).Value > GrtVol Then
+            
+                'Replace GrtVol variable with the greater value
+                GrtVol = ws.Cells(i, 13).Value
+                'Replace GrtVolTicker variable with the ticker name which has the greater stock value
+                GrtVolTicker = ws.Cells(i, 10).Value
+            
+            Else
+            
+            End If
+    
+        Next i
+    
+        'Show the final figures in the Bonus Table
+        ws.Cells(2, 17).Value = GrtIncTicker
+        ws.Cells(2, 18).Value = GrtIncrease
+        ws.Cells(3, 17).Value = GrtDecTicker
+        ws.Cells(3, 18).Value = GrtDecrease
+        ws.Cells(4, 17).Value = GrtVolTicker
+        ws.Cells(4, 18).Value = GrtVol
+
+        'Change the format of the Greatest % Increase and Decrease cells to show % with two decimal places
+       
+        ws.Cells(2, 18).NumberFormat = "0.00%"
+        ws.Cells(3, 18).NumberFormat = "0.00%"
+        
+    Next ws
+    
+    MsgBox ("Assignment done for all 3 sheets")
+
+End Sub
